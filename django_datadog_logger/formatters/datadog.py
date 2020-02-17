@@ -83,7 +83,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             if getattr(request, "user", None) is not None and getattr(
                 request.user, "is_authenticated", False
             ):
-                log_entry_dict["usr.pk"] = getattr(request.user, "pk", None)
+                log_entry_dict["usr.id"] = getattr(request.user, "pk", None)
                 log_entry_dict["usr.name"] = getattr(request.user, "username", None)
                 log_entry_dict["usr.email"] = getattr(request.user, "email", None)
             if getattr(request, "session", None) is not None and getattr(
