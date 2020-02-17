@@ -37,7 +37,7 @@ setup(
     long_description=readme + '\n\n' + history,
     include_package_data=True,
     keywords='django_datadog_logger',
-    name='django_datadog_logger',
+    name='django-datadog-logger',
     packages=find_packages(include=['django_datadog_logger', 'django_datadog_logger.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
