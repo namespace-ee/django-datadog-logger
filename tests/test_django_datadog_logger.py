@@ -5,7 +5,7 @@
 
 import unittest
 
-from django_datadog_logger import django_datadog_logger
+from django_datadog_logger import *
 
 
 class TestDjango_datadog_logger(unittest.TestCase):
