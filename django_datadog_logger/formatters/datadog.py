@@ -48,9 +48,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "logger.name": record.name,
             "logger.thread_name": record.threadName,
             "logger.method_name": record.funcName,
-            "syslog.timestamp": pytz.utc.localize(
-                datetime.datetime.utcfromtimestamp(record.created)
-            ).isoformat(),
+            "syslog.timestamp": pytz.utc.localize(datetime.datetime.utcfromtimestamp(record.created)).isoformat(),
             "syslog.severity": record.levelname,
         }
 
@@ -74,21 +72,13 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
             if hasattr(request, "request_id"):
                 log_entry_dict["http.request_id"] = request.request_id
-            if (
-                getattr(request, "auth", None) is not None
-                and isinstance(request.auth, dict)
-                and "sid" in request.auth
-            ):
+            if getattr(request, "auth", None) is not None and isinstance(request.auth, dict) and "sid" in request.auth:
                 log_entry_dict["usr.session_id"] = request.auth["sid"]
-            if getattr(request, "user", None) is not None and getattr(
-                request.user, "is_authenticated", False
-            ):
+            if getattr(request, "user", None) is not None and getattr(request.user, "is_authenticated", False):
                 log_entry_dict["usr.id"] = getattr(request.user, "pk", None)
                 log_entry_dict["usr.name"] = getattr(request.user, "username", None)
                 log_entry_dict["usr.email"] = getattr(request.user, "email", None)
-            if getattr(request, "session", None) is not None and getattr(
-                request.session, "session_key"
-            ):
+            if getattr(request, "session", None) is not None and getattr(request.session, "session_key"):
                 log_entry_dict["usr.session_key"] = request.session.session_key
 
         if hasattr(settings, "DATADOG_TRACE") and "TAGS" in settings.DATADOG_TRACE:
@@ -100,9 +90,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
                 log_entry_dict["error.message"] = record.msg
             else:
                 log_entry_dict["error.kind"] = record.exc_info[0].__name__
-                for msg in traceback.format_exception_only(
-                    record.exc_info[0], record.exc_info[1]
-                ):
+                for msg in traceback.format_exception_only(record.exc_info[0], record.exc_info[1]):
                     log_entry_dict["error.message"] = msg.strip()
             log_entry_dict["error.stack"] = self.formatException(record.exc_info)
 
@@ -122,9 +110,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
                     log_entry_dict["duration"] = extra["data"]["runtime"] * 1000000000
 
         if hasattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"):
-            if re.match(
-                getattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"), record.name
-            ):
+            if re.match(getattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"), record.name):
                 log_entry_dict.update(extra)
 
         return log_entry_dict
@@ -142,6 +128,5 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         return {
             attr_name: record.__dict__[attr_name]
             for attr_name in record.__dict__
-            if attr_name
-            not in json_log_formatter.BUILTIN_ATTRS.union(EXCLUDE_FROM_EXTRA_ATTRS)
+            if attr_name not in json_log_formatter.BUILTIN_ATTRS.union(EXCLUDE_FROM_EXTRA_ATTRS)
         }
