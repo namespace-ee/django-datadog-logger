@@ -10,11 +10,21 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ ]
+requirements = []
+with open('requirements.txt') as requirements_file:
+    for line in requirements_file.readlines():
+        # skip to next iteration if comment or empty line
+        if line.startswith("#") or line == "" or line.startswith("http") or line.startswith("git"):
+            continue
+        # add line to requirements
+        requirements.append(line)
 
 setup_requirements = [ ]
 
 test_requirements = [ ]
+
+
+
 
 setup(
     author="Lenno Nagel",
