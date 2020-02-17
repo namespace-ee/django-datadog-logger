@@ -25,5 +25,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: lnagel/django_datadog_logger
+    repo: lnagel/django-datadog-logger
     python: 3.8

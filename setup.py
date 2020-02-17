@@ -42,7 +42,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/lnagel/django_datadog_logger',
+    url='https://github.com/namespace-ee/django-datadog-logger',
     version='0.1.0',
     zip_safe=False,
 )

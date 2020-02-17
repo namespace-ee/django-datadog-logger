@@ -3,19 +3,19 @@ Django DataDog Logger
 =====================
 
 
-.. image:: https://img.shields.io/pypi/v/django_datadog_logger.svg
-        :target: https://pypi.python.org/pypi/django_datadog_logger
+.. image:: https://img.shields.io/pypi/v/django-datadog-logger.svg
+        :target: https://pypi.python.org/pypi/django-datadog-logger
 
-.. image:: https://img.shields.io/travis/lnagel/django_datadog_logger.svg
-        :target: https://travis-ci.com/lnagel/django_datadog_logger
+.. image:: https://img.shields.io/travis/namespace-ee/django-datadog-logger.svg
+        :target: https://travis-ci.com/namespace-ee/django-datadog-logger
 
 .. image:: https://readthedocs.org/projects/django-datadog-logger/badge/?version=latest
         :target: https://django-datadog-logger.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
-.. image:: https://pyup.io/repos/github/lnagel/django_datadog_logger/shield.svg
-     :target: https://pyup.io/repos/github/lnagel/django_datadog_logger/
+.. image:: https://pyup.io/repos/github/namespace-ee/django-datadog-logger/shield.svg
+     :target: https://pyup.io/repos/github/namespace-ee/django-datadog-logger/
      :alt: Updates
 
 
