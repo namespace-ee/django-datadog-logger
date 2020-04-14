@@ -1,7 +1,7 @@
 import time
 import uuid
 
-from django_datadog_logger.request import local
+from django_datadog_logger.wsgi import local
 from django_datadog_logger.local import release_local
 
 

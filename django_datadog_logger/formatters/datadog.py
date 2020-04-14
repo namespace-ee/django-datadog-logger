@@ -20,6 +20,8 @@ EXCLUDE_FROM_EXTRA_ATTRS = {
     "request_id",
     "client_ip",
     "request",
+    "celery_request",
+    "wsgi_request",
     "params",
     "sql",
 }
@@ -52,8 +54,13 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "syslog.severity": record.levelname,
         }
 
-        if getattr(record, "request", None) is not None:
-            request = record.request
+        if getattr(record, "celery_request", None) is not None:
+            celery_request = record.celery_request
+            log_entry_dict["celery.task_id"] = celery_request.id
+            log_entry_dict["celery.task_name"] = celery_request.task
+
+        if getattr(record, "wsgi_request", None) is not None:
+            request = record.wsgi_request
 
             log_entry_dict["network.client.ip"] = get_client_ip(request)
 
