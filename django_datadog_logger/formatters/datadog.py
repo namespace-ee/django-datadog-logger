@@ -84,9 +84,15 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
             if hasattr(wsgi_request, "request_id"):
                 log_entry_dict["http.request_id"] = wsgi_request.request_id
-            if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict) and "sid" in wsgi_request.auth:
+            if (
+                getattr(wsgi_request, "auth", None) is not None
+                and isinstance(wsgi_request.auth, dict)
+                and "sid" in wsgi_request.auth
+            ):
                 log_entry_dict["usr.session_id"] = wsgi_request.auth["sid"]
-            if getattr(wsgi_request, "user", None) is not None and getattr(wsgi_request.user, "is_authenticated", False):
+            if getattr(wsgi_request, "user", None) is not None and getattr(
+                wsgi_request.user, "is_authenticated", False
+            ):
                 log_entry_dict["usr.id"] = getattr(wsgi_request.user, "pk", None)
                 log_entry_dict["usr.name"] = getattr(wsgi_request.user, "username", None)
                 log_entry_dict["usr.email"] = getattr(wsgi_request.user, "email", None)
