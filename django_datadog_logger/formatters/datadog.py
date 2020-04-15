@@ -11,6 +11,8 @@ from rest_framework.compat import unicode_http_header
 from rest_framework.utils.mediatypes import _MediaType
 
 from django_datadog_logger.encoders import SafeJsonEncoder
+import django_datadog_logger.celery
+import django_datadog_logger.wsgi
 
 # those fields are excluded from extra dict
 # and remains acceptable in record
@@ -58,36 +60,38 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         celery_request = self.get_celery_request(record)
         if celery_request is not None:
             log_entry_dict["celery.task_id"] = celery_request.id
-            log_entry_dict["celery.task_name"] = celery_request.task
+            if isinstance(celery_request.task, str):
+                log_entry_dict["celery.task_name"] = celery_request.task
+            elif hasattr(celery_request.task, "name"):
+                log_entry_dict["celery.task_name"] = celery_request.task.name
 
-        if getattr(record, "wsgi_request", None) is not None:
-            request = record.wsgi_request
+        wsgi_request = self.get_wsgi_request()
+        if wsgi_request is not None:
+            log_entry_dict["network.client.ip"] = get_client_ip(wsgi_request)
 
-            log_entry_dict["network.client.ip"] = get_client_ip(request)
+            domain, port = split_domain_port(wsgi_request.get_host())
 
-            domain, port = split_domain_port(request.get_host())
-
-            log_entry_dict["http.url"] = request.get_full_path()
+            log_entry_dict["http.url"] = wsgi_request.get_full_path()
             log_entry_dict["http.url_details.host"] = domain
             log_entry_dict["http.url_details.port"] = int(port) if port else None
-            log_entry_dict["http.url_details.path"] = request.path_info
-            log_entry_dict["http.url_details.queryString"] = request.GET.dict()
-            log_entry_dict["http.url_details.scheme"] = request.scheme
-            log_entry_dict["http.method"] = request.method
-            log_entry_dict["http.referer"] = request.META.get("HTTP_REFERER")
-            log_entry_dict["http.useragent"] = request.META.get("HTTP_USER_AGENT")
-            log_entry_dict["http.request_version"] = determine_version(request)
+            log_entry_dict["http.url_details.path"] = wsgi_request.path_info
+            log_entry_dict["http.url_details.queryString"] = wsgi_request.GET.dict()
+            log_entry_dict["http.url_details.scheme"] = wsgi_request.scheme
+            log_entry_dict["http.method"] = wsgi_request.method
+            log_entry_dict["http.referer"] = wsgi_request.META.get("HTTP_REFERER")
+            log_entry_dict["http.useragent"] = wsgi_request.META.get("HTTP_USER_AGENT")
+            log_entry_dict["http.request_version"] = determine_version(wsgi_request)
 
-            if hasattr(request, "request_id"):
-                log_entry_dict["http.request_id"] = request.request_id
-            if getattr(request, "auth", None) is not None and isinstance(request.auth, dict) and "sid" in request.auth:
-                log_entry_dict["usr.session_id"] = request.auth["sid"]
-            if getattr(request, "user", None) is not None and getattr(request.user, "is_authenticated", False):
-                log_entry_dict["usr.id"] = getattr(request.user, "pk", None)
-                log_entry_dict["usr.name"] = getattr(request.user, "username", None)
-                log_entry_dict["usr.email"] = getattr(request.user, "email", None)
-            if getattr(request, "session", None) is not None and getattr(request.session, "session_key"):
-                log_entry_dict["usr.session_key"] = request.session.session_key
+            if hasattr(wsgi_request, "request_id"):
+                log_entry_dict["http.request_id"] = wsgi_request.request_id
+            if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict) and "sid" in wsgi_request.auth:
+                log_entry_dict["usr.session_id"] = wsgi_request.auth["sid"]
+            if getattr(wsgi_request, "user", None) is not None and getattr(wsgi_request.user, "is_authenticated", False):
+                log_entry_dict["usr.id"] = getattr(wsgi_request.user, "pk", None)
+                log_entry_dict["usr.name"] = getattr(wsgi_request.user, "username", None)
+                log_entry_dict["usr.email"] = getattr(wsgi_request.user, "email", None)
+            if getattr(wsgi_request, "session", None) is not None and getattr(wsgi_request.session, "session_key"):
+                log_entry_dict["usr.session_key"] = wsgi_request.session.session_key
 
         if hasattr(settings, "DATADOG_TRACE") and "TAGS" in settings.DATADOG_TRACE:
             log_entry_dict["syslog.env"] = settings.DATADOG_TRACE["TAGS"].get("env")
@@ -126,9 +130,10 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
     def get_celery_request(self, record):
         if record.name == "celery.worker.strategy" and record.args and isinstance(record.args[0], Request):
             return record.args[0]
-        elif getattr(record, "celery_request", None) is not None:
-            return record.celery_request
-        return None
+        return django_datadog_logger.celery.get_celery_request()
+
+    def get_wsgi_request(self):
+        return django_datadog_logger.wsgi.get_wsgi_request()
 
     def to_json(self, record):
         return self.json_lib.dumps(record, cls=SafeJsonEncoder)
