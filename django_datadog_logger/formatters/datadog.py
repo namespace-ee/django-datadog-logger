@@ -59,7 +59,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
         celery_request = self.get_celery_request(record)
         if celery_request is not None:
-            log_entry_dict["celery.task_id"] = celery_request.id
+            log_entry_dict["celery.request_id"] = celery_request.id
             if isinstance(celery_request.task, str):
                 log_entry_dict["celery.task_name"] = celery_request.task
             elif hasattr(celery_request.task, "name"):
@@ -115,7 +115,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         if record.name == "celery.app.trace":
             if "data" in extra:
                 if "id" in extra["data"]:
-                    log_entry_dict["celery.task_id"] = extra["data"]["id"]
+                    log_entry_dict["celery.request_id"] = extra["data"]["id"]
                 if "name" in extra["data"]:
                     log_entry_dict["celery.task_name"] = extra["data"]["name"]
                 if "runtime" in extra["data"]:
