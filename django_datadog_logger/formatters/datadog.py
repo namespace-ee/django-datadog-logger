@@ -4,6 +4,7 @@ import traceback
 
 import pytz
 import json_log_formatter
+from celery.worker.request import Request
 from django.conf import settings
 from django.http.request import split_domain_port
 from rest_framework.compat import unicode_http_header
@@ -54,8 +55,8 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "syslog.severity": record.levelname,
         }
 
-        if getattr(record, "celery_request", None) is not None:
-            celery_request = record.celery_request
+        celery_request = self.get_celery_request(record)
+        if celery_request is not None:
             log_entry_dict["celery.task_id"] = celery_request.id
             log_entry_dict["celery.task_name"] = celery_request.task
 
@@ -121,6 +122,13 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
                 log_entry_dict.update(extra)
 
         return log_entry_dict
+
+    def get_celery_request(self, record):
+        if record.name == "celery.worker.strategy" and record.args and isinstance(record.args[0], Request):
+            return record.args[0]
+        elif getattr(record, "celery_request", None) is not None:
+            return record.celery_request
+        return None
 
     def to_json(self, record):
         return self.json_lib.dumps(record, cls=SafeJsonEncoder)
