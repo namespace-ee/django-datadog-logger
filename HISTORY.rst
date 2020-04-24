@@ -2,6 +2,11 @@
 History
 =======
 
+0.3.1 (2020-04-24)
+------------------
+
+* Removed API_LOG_REQUEST_DURATION_WARN_SECONDS
+
 0.3.0 (2020-04-15)
 ------------------
 
