@@ -96,7 +96,9 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
                 wsgi_request.user, "is_authenticated", False
             ):
                 log_entry_dict["usr.id"] = getattr(wsgi_request.user, "pk", None)
-                log_entry_dict["usr.name"] = getattr(wsgi_request.user, "username", None)
+                log_entry_dict["usr.name"] = getattr(
+                    wsgi_request.user, getattr(wsgi_request.user, "USERNAME_FIELD", "username"), None
+                )
                 log_entry_dict["usr.email"] = getattr(wsgi_request.user, "email", None)
 
             if getattr(wsgi_request, "session", None) is not None and getattr(wsgi_request.session, "session_key"):
