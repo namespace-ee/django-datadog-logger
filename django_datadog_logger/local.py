@@ -3,6 +3,8 @@ Based on https://github.com/mitsuhiko/werkzeug/blob/master/werkzeug/local.py
 
 Copyright (c) 2013 by the Werkzeug Team, see
 https://github.com/mitsuhiko/werkzeug/blob/master/AUTHORS for more details.
+
+TODO: consider replacing with https://github.com/django/asgiref/#threadlocal-replacement
 """
 
 
