@@ -2,6 +2,11 @@
 History
 =======
 
+0.3.3 (2020-11-04)
+------------------
+
+* Added support for incoming HTTP X-Request-ID header values
+
 0.3.2 (2020-04-24)
 ------------------
 
