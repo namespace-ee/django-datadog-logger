@@ -2,6 +2,11 @@
 History
 =======
 
+0.3.5 (2021-06-14)
+------------------
+
+* Prevent recursion when warnings are logged whilst accessing WSGI request.user
+
 0.3.4 (2021-06-14)
 ------------------
 
