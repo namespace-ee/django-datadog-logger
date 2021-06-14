@@ -16,6 +16,8 @@ import django_datadog_logger.wsgi
 
 # those fields are excluded from extra dict
 # and remains acceptable in record
+from django_datadog_logger.recursion import not_recursive, RecursionDetected
+
 EXCLUDE_FROM_EXTRA_ATTRS = {
     "user",
     "auth",
@@ -43,6 +45,13 @@ def determine_version(request):
     version = media_type.params.get("version")
     version = unicode_http_header(version)
     return version or None
+
+
+@not_recursive
+def get_wsgi_request_user(wsgi_request):
+    if getattr(wsgi_request, "user", None) is not None:
+        if getattr(wsgi_request.user, "is_authenticated", False):
+            return wsgi_request.user
 
 
 class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
@@ -92,14 +101,15 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             ):
                 log_entry_dict["usr.session_id"] = wsgi_request.auth["sid"]
 
-            if getattr(wsgi_request, "user", None) is not None and getattr(
-                wsgi_request.user, "is_authenticated", False
-            ):
-                log_entry_dict["usr.id"] = getattr(wsgi_request.user, "pk", None)
-                log_entry_dict["usr.name"] = getattr(
-                    wsgi_request.user, getattr(wsgi_request.user, "USERNAME_FIELD", "username"), None
-                )
-                log_entry_dict["usr.email"] = getattr(wsgi_request.user, "email", None)
+            try:
+                user = get_wsgi_request_user(wsgi_request)
+            except RecursionDetected:
+                user = None
+
+            if user:
+                log_entry_dict["usr.id"] = getattr(user, "pk", None)
+                log_entry_dict["usr.name"] = getattr(user, getattr(user, "USERNAME_FIELD", "username"), None)
+                log_entry_dict["usr.email"] = getattr(user, "email", None)
 
             if getattr(wsgi_request, "session", None) is not None and getattr(wsgi_request.session, "session_key"):
                 log_entry_dict["usr.session_key"] = wsgi_request.session.session_key
