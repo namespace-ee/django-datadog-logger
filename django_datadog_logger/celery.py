@@ -1,10 +1,8 @@
 from functools import wraps
-from uuid import uuid4
 
 from celery import Task
-from celery.utils.threads import release_local
 
-from django_datadog_logger.local import Local  # NOQA
+from django_datadog_logger.local import Local, release_local  # NOQA
 
 local = Local()
 
