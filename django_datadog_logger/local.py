@@ -8,11 +8,6 @@ TODO: consider replacing with https://github.com/django/asgiref/#threadlocal-rep
 """
 
 
-from future import standard_library
-
-standard_library.install_aliases()
-
-
 __all__ = ["Local", "release_local"]
 
 try:
