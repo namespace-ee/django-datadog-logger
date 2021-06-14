@@ -30,7 +30,7 @@ Django DataDog Logger integration package.
 Quick start
 -----------
 
-Set up request id tracking (in front) and logging middlewares (at the end)
+Set up request id tracking (in front) and logging middlewares (at the end):
 
 .. code-block:: python
 
@@ -41,7 +41,7 @@ Set up request id tracking (in front) and logging middlewares (at the end)
         "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
     ]
 
-Configure LOGGERS in your Django settings file
+Configure LOGGERS in your Django settings file:
 
 .. code-block:: python
 
@@ -104,7 +104,7 @@ Configure LOGGERS in your Django settings file
     }
     DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = r"^(django_datadog_logger|my_project)(|\..+)$"
 
-Add Celery logger configuration and request_id tracking decorator to tasks
+Add Celery logger configuration and request_id tracking decorator to tasks:
 
 .. code-block:: python
 
