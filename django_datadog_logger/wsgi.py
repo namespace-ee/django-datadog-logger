@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from django_datadog_logger.local import Local  # NOQA
 
 local = Local()
