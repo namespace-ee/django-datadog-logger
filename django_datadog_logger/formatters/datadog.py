@@ -66,6 +66,10 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "syslog.severity": record.levelname,
         }
 
+        # Add special `dd.` log record attributes added by `ddtrace` library
+        # For example: dd.trace_id, dd.span_id, dd.service, dd.env, dd.version, etc
+        log_entry_dict.update(self.get_datadog_attributes(record))
+
         celery_request = self.get_celery_request(record)
         if celery_request is not None:
             log_entry_dict["celery.request_id"] = celery_request.id
@@ -153,6 +157,10 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             if isinstance(record.args, (list, tuple)) and isinstance(record.args[0], Request):
                 return record.args[0]
         return django_datadog_logger.celery.get_celery_request()
+
+    def get_datadog_attributes(self, record):
+        """Helper to extract dd.* attributes from the log record."""
+        return {attr_name: record.__dict__[attr_name] for attr_name in record.__dict__ if attr_name.startswith("dd.")}
 
     def get_wsgi_request(self):
         return django_datadog_logger.wsgi.get_wsgi_request()
