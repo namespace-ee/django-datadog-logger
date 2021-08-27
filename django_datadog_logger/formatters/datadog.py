@@ -149,8 +149,9 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         return log_entry_dict
 
     def get_celery_request(self, record):
-        if record.name == "celery.worker.strategy" and record.args and isinstance(record.args[0], Request):
-            return record.args[0]
+        if record.name == "celery.worker.strategy" and record.args:
+            if isinstance(record.args, (list, tuple)) and isinstance(record.args[0], Request):
+                return record.args[0]
         return django_datadog_logger.celery.get_celery_request()
 
     def get_wsgi_request(self):
