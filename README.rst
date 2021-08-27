@@ -159,6 +159,49 @@ Add Celery logger configuration and request_id tracking decorator to tasks:
         logger.info("INFO", extra={"level": "INFO"})
         logger.debug("DEBUG", extra={"level": "DEBUG"})
         return 42
+        
+ddtrace
+-------
+
+The ddtrace library has an option to inject tracing context data into log records: https://ddtrace.readthedocs.io/en/stable/advanced_usage.html#logs-injection
+
+There is a helper to look for those attributes and add them automatically to the log entry created by this library.
+
+.. code-block:: python
+
+    # log.py
+
+    # Patch logging library to inject dd.* attributes on log records
+    import ddtrace
+    ddtrace.patch(logging=True)
+
+    # Configure logger with DataDogJSONFormatter
+    import logging
+    from django_datadog_logger.formatters.datadog import DataDogJSONFormatter
+
+    logger = logging.root
+
+    handler = logging.StreamHandler()
+    handler.formatter = DataDogJSONFormatter()
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
+
+    # Log a test message
+    logger.info("test")
+
+.. code-block:: bash
+
+    $ DD_SERVICE=django DD_ENV=test DD_VERSION=1234 python log.py
+    {"message": "test", "logger.name": "root", "logger.thread_name": "MainThread", "logger.method_name": "<module>", "syslog.timestamp": "2021-08-23T18:26:10.391099+00:00", "syslog.severity": "INFO", "dd.version": "1234", "dd.env": "test", "dd.service": "django", "dd.trace_id": "0", "dd.span_id": "0"}
+
+If you remove the call to `datadog.patch(logging=True)` you end up with:
+
+.. code-block:: bash
+
+    $ python test.py
+    {"message": "test", "logger.name": "root", "logger.thread_name": "MainThread", "logger.method_name": "<module>", "syslog.timestamp": "2021-08-23T18:27:47.951461+00:00", "syslog.severity": "INFO"}
+
 
 Credits
 -------
