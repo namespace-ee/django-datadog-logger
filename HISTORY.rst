@@ -2,6 +2,13 @@
 History
 =======
 
+0.4.0 (2021-08-27)
+------------------
+
+* Enhancement: Updated formatting in README.rst #5
+* Enhancement: Extract and add dd.* attributes from log record to log entry dict #6
+* Fixed: KeyError because a dict appears where a list is expected #7
+
 0.3.5 (2021-06-14)
 ------------------
 
