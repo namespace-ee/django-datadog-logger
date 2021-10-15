@@ -2,6 +2,7 @@ import datetime
 import re
 import traceback
 
+import celery
 import pytz
 import json_log_formatter
 from celery.worker.request import Request
@@ -70,13 +71,18 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         # For example: dd.trace_id, dd.span_id, dd.service, dd.env, dd.version, etc
         log_entry_dict.update(self.get_datadog_attributes(record))
 
-        celery_request = self.get_celery_request(record)
-        if celery_request is not None:
-            log_entry_dict["celery.request_id"] = celery_request.id
-            if isinstance(celery_request.task, str):
-                log_entry_dict["celery.task_name"] = celery_request.task
-            elif hasattr(celery_request.task, "name"):
-                log_entry_dict["celery.task_name"] = celery_request.task.name
+        if celery.__version__ >= "5.0.0":
+            if record and record.name == "celery.worker.strategy":
+                log_entry_dict["celery.request_id"] = record.data.get("id")
+                log_entry_dict["celery.task_name"] = record.data.get("name")
+        else:
+            celery_request = self.get_celery_request(record)
+            if celery_request is not None:
+                log_entry_dict["celery.request_id"] = celery_request.id
+                if isinstance(celery_request.task, str):
+                    log_entry_dict["celery.task_name"] = celery_request.task
+                elif hasattr(celery_request.task, "name"):
+                    log_entry_dict["celery.task_name"] = celery_request.task.name
 
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
