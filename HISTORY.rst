@@ -2,7 +2,7 @@
 History
 =======
 
-0.4.1 (2021-10-15)
+0.5.0 (2021-10-15)
 ------------------
 
 * Datadog Json formatter support Celery v5+
