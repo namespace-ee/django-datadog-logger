@@ -15,10 +15,11 @@ def get_celery_request():
 
 
 def get_task_name(request):
-    if isinstance(request.task, str):
-        return request.task
-    elif hasattr(request.task, "name"):
-        return request.task.name
+    if hasattr(request, "task"):
+        if isinstance(request.task, str):
+            return request.task
+        elif hasattr(request.task, "name"):
+            return request.task.name
     return None
 
 
