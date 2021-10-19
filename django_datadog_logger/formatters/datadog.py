@@ -12,6 +12,7 @@ from rest_framework.compat import unicode_http_header
 from rest_framework.utils.mediatypes import _MediaType
 
 from django_datadog_logger.encoders import SafeJsonEncoder
+from django_datadog_logger.celery import get_task_name
 import django_datadog_logger.celery
 import django_datadog_logger.wsgi
 
@@ -71,18 +72,10 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         # For example: dd.trace_id, dd.span_id, dd.service, dd.env, dd.version, etc
         log_entry_dict.update(self.get_datadog_attributes(record))
 
-        if celery.__version__ >= "5.0.0":
-            if record and record.name == "celery.worker.strategy":
-                log_entry_dict["celery.request_id"] = record.data.get("id")
-                log_entry_dict["celery.task_name"] = record.data.get("name")
-        else:
-            celery_request = self.get_celery_request(record)
-            if celery_request is not None:
-                log_entry_dict["celery.request_id"] = celery_request.id
-                if isinstance(celery_request.task, str):
-                    log_entry_dict["celery.task_name"] = celery_request.task
-                elif hasattr(celery_request.task, "name"):
-                    log_entry_dict["celery.task_name"] = celery_request.task.name
+        celery_request = self.get_celery_request(record)
+        if celery_request is not None:
+            log_entry_dict["celery.request_id"] = celery_request["id"]
+            log_entry_dict["celery.task_name"] = celery_request["name"]
 
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
@@ -161,7 +154,9 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
     def get_celery_request(self, record):
         if record.name == "celery.worker.strategy" and record.args:
             if isinstance(record.args, (list, tuple)) and isinstance(record.args[0], Request):
-                return record.args[0]
+                return {"id": record.args[0].id, "name": get_task_name(record.args[0])}
+            elif isinstance(record.args, dict):
+                return {"id": record.data.get("id"), "name": record.data.get("name")}
         return django_datadog_logger.celery.get_celery_request()
 
     def get_datadog_attributes(self, record):
