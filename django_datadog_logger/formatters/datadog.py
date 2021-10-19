@@ -2,7 +2,6 @@ import datetime
 import re
 import traceback
 
-import celery
 import pytz
 import json_log_formatter
 from celery.worker.request import Request
