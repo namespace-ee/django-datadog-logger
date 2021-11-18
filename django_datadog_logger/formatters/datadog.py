@@ -42,7 +42,7 @@ def get_client_ip(request):
 
 
 def determine_version(request):
-    media_type = _MediaType(request.META.get("HTTP_ACCEPT"))
+    media_type = _MediaType((request.META.get("HTTP_ACCEPT") or "").split(",")[0])
     version = media_type.params.get("version")
     version = unicode_http_header(version)
     return version or None
