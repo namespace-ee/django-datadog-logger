@@ -42,16 +42,14 @@ class ActionLogMixin:
         return message, extra
 
     def perform_create(self, serializer):
-        with transaction.atomic():
-            instance = serializer.save()
-            message, extra = self.get_create_log_entity(serializer, instance, "created")
-            logger.info(message, extra=extra)
+        super().perform_create(serializer)
+        message, extra = self.get_create_log_entity(serializer, serializer.instance, "created")
+        logger.info(message, extra=extra)
 
     def perform_update(self, serializer):
-        with transaction.atomic():
-            instance = serializer.save()
-            message, extra = self.get_create_log_entity(serializer, instance, "updated")
-            logger.info(message, extra=extra)
+        super().perform_update(serializer)
+        message, extra = self.get_create_log_entity(serializer, serializer.instance, "updated")
+        logger.info(message, extra=extra)
 
     def perform_destroy(self, instance):
         with transaction.atomic():
