@@ -2,6 +2,11 @@
 History
 =======
 
+0.5.1 (2022-08-09)
+------------------
+
+* Fixed: ActionLoginMixin class methods `perform_create` and `perform_update` call `super()`. Remove atomic transaction
+
 0.5.0 (2021-10-20)
 ------------------
 
