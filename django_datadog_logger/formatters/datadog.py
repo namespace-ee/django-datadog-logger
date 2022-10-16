@@ -6,6 +6,7 @@ import pytz
 import json_log_formatter
 from celery.worker.request import Request
 from django.conf import settings
+from django.core.exceptions import DisallowedHost
 from django.http.request import split_domain_port
 from rest_framework.compat import unicode_http_header
 from rest_framework.utils.mediatypes import _MediaType
@@ -80,7 +81,10 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         if wsgi_request is not None:
             log_entry_dict["network.client.ip"] = get_client_ip(wsgi_request)
 
-            domain, port = split_domain_port(wsgi_request.get_host())
+            try:
+                domain, port = split_domain_port(wsgi_request.get_host())
+            except DisallowedHost:
+                domain, port = None, None
 
             log_entry_dict["http.url"] = wsgi_request.get_full_path()
             log_entry_dict["http.url_details.host"] = domain
