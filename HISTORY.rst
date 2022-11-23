@@ -2,6 +2,11 @@
 History
 =======
 
+0.5.2 (2022-11-23)
+------------------
+
+* Fixed: don't let the logger throw a DisallowedHost error
+
 0.5.1 (2022-08-09)
 ------------------
 
