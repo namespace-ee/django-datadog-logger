@@ -2,6 +2,11 @@
 History
 =======
 
+0.5.4 (2023-01-16)
+------------------
+
+* Added support for HTTP Accept header as `http.accept`
+
 0.5.3 (2022-12-19)
 ------------------
 
