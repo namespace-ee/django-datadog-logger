@@ -2,6 +2,12 @@
 History
 =======
 
+0.5.5 (2023-01-16)
+------------------
+
+* Improved support for request version reporting in `http.request_version`
+* Add support for `http.url_details.view_name`
+
 0.5.4 (2023-01-16)
 ------------------
 
