@@ -8,6 +8,7 @@ from celery.worker.request import Request
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
 from django.http.request import split_domain_port
+from django.urls import resolve, NoReverseMatch, Resolver404
 from rest_framework.compat import unicode_http_header
 from rest_framework.utils.mediatypes import _MediaType
 
@@ -86,12 +87,18 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             except DisallowedHost:
                 domain, port = None, None
 
+            try:
+                resolver_match = resolve(wsgi_request.path)
+            except (NoReverseMatch, Resolver404):
+                resolver_match = None
+
             log_entry_dict["http.url"] = wsgi_request.get_full_path()
             log_entry_dict["http.url_details.host"] = domain
             log_entry_dict["http.url_details.port"] = int(port) if port else None
             log_entry_dict["http.url_details.path"] = wsgi_request.path_info
             log_entry_dict["http.url_details.queryString"] = wsgi_request.GET.dict()
             log_entry_dict["http.url_details.scheme"] = wsgi_request.scheme
+            log_entry_dict["http.url_details.view_name"] = resolver_match.view_name if resolver_match else None
             log_entry_dict["http.method"] = wsgi_request.method
             log_entry_dict["http.accept"] = wsgi_request.META.get("HTTP_ACCEPT")
             log_entry_dict["http.referer"] = wsgi_request.META.get("HTTP_REFERER")
