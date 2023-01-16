@@ -93,6 +93,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             log_entry_dict["http.url_details.queryString"] = wsgi_request.GET.dict()
             log_entry_dict["http.url_details.scheme"] = wsgi_request.scheme
             log_entry_dict["http.method"] = wsgi_request.method
+            log_entry_dict["http.accept"] = wsgi_request.META.get("HTTP_ACCEPT")
             log_entry_dict["http.referer"] = wsgi_request.META.get("HTTP_REFERER")
             log_entry_dict["http.useragent"] = wsgi_request.META.get("HTTP_USER_AGENT")
             log_entry_dict["http.request_version"] = determine_version(wsgi_request)
