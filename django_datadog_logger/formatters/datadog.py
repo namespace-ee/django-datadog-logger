@@ -55,6 +55,12 @@ def determine_version(request):
 
 
 @not_recursive
+def get_wsgi_request_auth(wsgi_request):
+    if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict):
+        return wsgi_request.auth
+
+
+@not_recursive
 def get_wsgi_request_user(wsgi_request):
     if getattr(wsgi_request, "user", None) is not None:
         if getattr(wsgi_request.user, "is_authenticated", False):
@@ -112,11 +118,16 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             if hasattr(wsgi_request, "request_id"):
                 log_entry_dict["http.request_id"] = wsgi_request.request_id
 
-            if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict):
-                if "sid" in wsgi_request.auth:
-                    log_entry_dict["usr.session_id"] = wsgi_request.auth["sid"]
-                if "cid" in wsgi_request.auth:
-                    log_entry_dict["usr.client_id"] = wsgi_request.auth["cid"]
+            try:
+                auth = get_wsgi_request_auth(wsgi_request)
+            except RecursionDetected:
+                auth = None
+
+            if auth:
+                if "sid" in auth:
+                    log_entry_dict["usr.session_id"] = auth["sid"]
+                if "cid" in auth:
+                    log_entry_dict["usr.client_id"] = auth["cid"]
 
             try:
                 user = get_wsgi_request_user(wsgi_request)
