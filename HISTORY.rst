@@ -2,6 +2,11 @@
 History
 =======
 
+0.5.6 (2023-01-17)
+------------------
+
+* Datadog formatter: avoid recursion loop when accessing WSGI request auth attribute
+
 0.5.5 (2023-01-16)
 ------------------
 
