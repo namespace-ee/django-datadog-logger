@@ -2,6 +2,11 @@
 History
 =======
 
+0.6.1 (2023-04-27)
+------------------
+
+* Removed dependency on Celery package, fixed import error
+
 0.6.0 (2023-04-27)
 ------------------
 
