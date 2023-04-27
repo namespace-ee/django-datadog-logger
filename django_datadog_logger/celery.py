@@ -1,7 +1,5 @@
 from functools import wraps
 
-from celery import Task
-
 from django_datadog_logger.local import Local, release_local  # NOQA
 
 local = Local()
