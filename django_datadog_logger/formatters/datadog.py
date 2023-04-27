@@ -4,16 +4,14 @@ import traceback
 
 import pytz
 import json_log_formatter
-from celery.worker.request import Request
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
 from django.http.request import split_domain_port
 from django.urls import resolve, NoReverseMatch, Resolver404
 from rest_framework.compat import unicode_http_header
-from rest_framework.utils.mediatypes import _MediaType
 
 from django_datadog_logger.encoders import SafeJsonEncoder
-from django_datadog_logger.celery import get_task_name
+from django_datadog_logger.celery import get_task_name, get_celery_request
 import django_datadog_logger.celery
 import django_datadog_logger.wsgi
 
@@ -69,7 +67,6 @@ def get_wsgi_request_user(wsgi_request):
 
 class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
     def json_record(self, message, extra, record):
-
         log_entry_dict = {
             "message": message,
             "logger.name": record.name,
@@ -82,11 +79,6 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         # Add special `dd.` log record attributes added by `ddtrace` library
         # For example: dd.trace_id, dd.span_id, dd.service, dd.env, dd.version, etc
         log_entry_dict.update(self.get_datadog_attributes(record))
-
-        celery_request = self.get_celery_request(record)
-        if celery_request is not None:
-            log_entry_dict["celery.request_id"] = celery_request["id"]
-            log_entry_dict["celery.task_name"] = celery_request["name"]
 
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
@@ -161,28 +153,23 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         if hasattr(record, "sql"):
             log_entry_dict["db.statement"] = record.sql
 
-        if record.name == "celery.app.trace":
-            if "data" in extra:
-                if "id" in extra["data"]:
-                    log_entry_dict["celery.request_id"] = extra["data"]["id"]
-                if "name" in extra["data"]:
-                    log_entry_dict["celery.task_name"] = extra["data"]["name"]
-                if "runtime" in extra["data"]:
-                    log_entry_dict["duration"] = extra["data"]["runtime"] * 1000000000
+        celery_request = get_celery_request()
+        if celery_request is not None:
+            log_entry_dict["celery.request_id"] = celery_request.id
+            log_entry_dict["celery.task_name"] = get_task_name(celery_request)
+        elif record.name in {"celery.app.trace", "celery.worker.strategy"} and "data" in extra:
+            if "id" in extra["data"]:
+                log_entry_dict["celery.request_id"] = extra["data"]["id"]
+            if "name" in extra["data"]:
+                log_entry_dict["celery.task_name"] = extra["data"]["name"]
+            if "runtime" in extra["data"]:
+                log_entry_dict["duration"] = extra["data"]["runtime"] * 1000000000
 
         if hasattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"):
             if re.match(getattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"), record.name):
                 log_entry_dict.update(extra)
 
         return log_entry_dict
-
-    def get_celery_request(self, record):
-        if record.name == "celery.worker.strategy" and record.args:
-            if isinstance(record.args, (list, tuple)) and isinstance(record.args[0], Request):
-                return {"id": record.args[0].id, "name": get_task_name(record.args[0])}
-            elif isinstance(record.args, dict):
-                return {"id": record.data.get("id"), "name": record.data.get("name")}
-        return django_datadog_logger.celery.get_celery_request()
 
     def get_datadog_attributes(self, record):
         """Helper to extract dd.* attributes from the log record."""

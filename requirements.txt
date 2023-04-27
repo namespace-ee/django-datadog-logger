@@ -1,4 +1,3 @@
 JSON-log-formatter
 Django
 djangorestframework
-celery>=4.0

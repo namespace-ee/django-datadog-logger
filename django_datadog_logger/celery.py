@@ -27,8 +27,10 @@ def store_celery_request(func):
     @wraps(func)
     def function_wrapper(*args, **kwargs):
         try:
-            if args and isinstance(args[0], Task) and hasattr(args[0], "request"):
-                local.request = {"id": args[0].request.id, "name": get_task_name(args[0].request)}
+            if args and hasattr(args[0], "request"):
+                request = args[0].request
+                if (type(request).__module__, type(request).__name__) == ("celery.app.task", "Context"):
+                    local.request = request
             return func(*args, **kwargs)
         finally:
             release_local(local)
