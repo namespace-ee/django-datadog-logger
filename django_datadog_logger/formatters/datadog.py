@@ -9,6 +9,7 @@ from django.core.exceptions import DisallowedHost
 from django.http.request import split_domain_port
 from django.urls import resolve, NoReverseMatch, Resolver404
 from rest_framework.compat import unicode_http_header
+from rest_framework.exceptions import AuthenticationFailed
 
 from django_datadog_logger.encoders import SafeJsonEncoder
 from django_datadog_logger.celery import get_task_name, get_celery_request
@@ -54,8 +55,11 @@ def determine_version(request):
 
 @not_recursive
 def get_wsgi_request_auth(wsgi_request):
-    if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict):
-        return wsgi_request.auth
+    try:
+        if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict):
+            return wsgi_request.auth
+    except Exception:  # NOQA
+        return None
 
 
 @not_recursive
