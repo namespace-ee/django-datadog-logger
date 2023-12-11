@@ -12,7 +12,7 @@ def generate_request_id():
 
 def get_or_create_request_id(request):
     request_id = request.META.get("HTTP_X_REQUEST_ID")
-    if request_id and re.match("^[a-zA-Z0-9+/=\-]{20,200}$", request_id):
+    if request_id and re.match("^[a-zA-Z0-9+/=-]{20,200}$", request_id):
         return request_id
     else:
         return generate_request_id()
