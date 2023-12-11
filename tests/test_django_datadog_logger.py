@@ -1,21 +1,33 @@
-#!/usr/bin/env python
-
 """Tests for `django_datadog_logger` package."""
-
-
+import logging
 import unittest
 
-from django_datadog_logger import *
+from django.conf import settings
+
+from django_datadog_logger.formatters.datadog import DataDogJSONFormatter
 
 
-class TestDjango_datadog_logger(unittest.TestCase):
-    """Tests for `django_datadog_logger` package."""
+class DjangoDatadogLoggerTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not settings.configured:
+            settings.configure()
 
-    def setUp(self):
-        """Set up test fixtures, if any."""
+    def test_format_json_accepts_a_tuple_of_nones_as_exc_info(self):
+        """
+        When logger is called with exc_info=True, then the exc_info
+        attribute of the LogRecord is a tuple of (None, None, None).
+        """
+        record = logging.LogRecord(
+            'foo',
+            logging.ERROR,
+            'foo.py',
+            42,
+            'This is an error',
+            None,
+            (None, None, None)
+        )
+        formatter = DataDogJSONFormatter()
+        json_record = formatter.json_record('Foo', {}, record)
 
-    def tearDown(self):
-        """Tear down test fixtures, if any."""
-
-    def test_000_something(self):
-        """Test something."""
+        self.assertEqual(json_record.get('error.kind'), None)
