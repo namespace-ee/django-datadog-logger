@@ -1,7 +1,6 @@
 import logging
 import time
 
-from django.conf import settings
 from rest_framework.utils.serializer_helpers import ReturnDict
 
 logger = logging.getLogger(__name__)
