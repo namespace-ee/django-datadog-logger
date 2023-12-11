@@ -144,7 +144,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             if hasattr(record, "status_code"):
                 log_entry_dict["error.kind"] = record.status_code
                 log_entry_dict["error.message"] = record.msg
-            else:
+            elif record.exc_info[0] is not None:
                 log_entry_dict["error.kind"] = record.exc_info[0].__name__
                 for msg in traceback.format_exception_only(record.exc_info[0], record.exc_info[1]):
                     log_entry_dict["error.message"] = msg.strip()
