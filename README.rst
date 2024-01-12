@@ -2,22 +2,20 @@
 Django DataDog Logger
 =====================
 
-
 .. image:: https://img.shields.io/pypi/v/django-datadog-logger.svg
-        :target: https://pypi.python.org/pypi/django-datadog-logger
+     :target: https://pypi.python.org/pypi/django-datadog-logger
 
-.. image:: https://img.shields.io/travis/namespace-ee/django-datadog-logger.svg
-        :target: https://travis-ci.com/namespace-ee/django-datadog-logger
+.. image:: https://github.com/namespace-ee/django-datadog-logger/actions/workflows/ci.yml/badge.svg?branch=master
+     :target: https://github.com/namespace-ee/django-datadog-logger/actions/workflows/ci.yml
+     :alt: CI Status
 
 .. image:: https://readthedocs.org/projects/django-datadog-logger/badge/?version=latest
-        :target: https://django-datadog-logger.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
+     :target: https://django-datadog-logger.readthedocs.io/en/latest/?badge=latest
+     :alt: Documentation Status
 
 .. image:: https://pyup.io/repos/github/namespace-ee/django-datadog-logger/shield.svg
      :target: https://pyup.io/repos/github/namespace-ee/django-datadog-logger/
      :alt: Updates
-
 
 
 Django DataDog Logger integration package.
@@ -159,7 +157,7 @@ Add Celery logger configuration and request_id tracking decorator to tasks:
         logger.info("INFO", extra={"level": "INFO"})
         logger.debug("DEBUG", extra={"level": "DEBUG"})
         return 42
-        
+
 ddtrace
 -------
 
