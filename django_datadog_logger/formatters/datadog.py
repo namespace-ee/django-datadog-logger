@@ -1,12 +1,14 @@
 import datetime
 import re
 import traceback
+import typing
+from logging import LogRecord
 
 import pytz
 import json_log_formatter
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
-from django.http.request import split_domain_port
+from django.http.request import split_domain_port, HttpRequest
 from django.urls import resolve, NoReverseMatch, Resolver404
 from rest_framework.compat import unicode_http_header
 
@@ -69,7 +71,7 @@ def get_wsgi_request_user(wsgi_request):
 
 
 class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
-    def json_record(self, message, extra, record):
+    def json_record(self, message: str, extra: dict, record: LogRecord) -> dict:
         log_entry_dict = {
             "message": message,
             "logger.name": record.name,
@@ -171,17 +173,18 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
         return log_entry_dict
 
-    def get_datadog_attributes(self, record):
+    def get_datadog_attributes(self, record: LogRecord) -> dict:
         """Helper to extract dd.* attributes from the log record."""
         return {attr_name: record.__dict__[attr_name] for attr_name in record.__dict__ if attr_name.startswith("dd.")}
 
-    def get_wsgi_request(self):
+    def get_wsgi_request(self) -> typing.Optional[HttpRequest]:
         return django_datadog_logger.wsgi.get_wsgi_request()
 
-    def to_json(self, record):
+    def to_json(self, record: dict) -> str:
+        """Converts record dict to a JSON string."""
         return self.json_lib.dumps(record, cls=SafeJsonEncoder)
 
-    def extra_from_record(self, record):
+    def extra_from_record(self, record: LogRecord) -> dict:
         """Returns `extra` dict you passed to logger.
 
         The `extra` keyword argument is used to populate the `__dict__` of
