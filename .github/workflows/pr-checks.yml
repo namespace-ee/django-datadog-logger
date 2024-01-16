@@ -56,10 +56,9 @@ jobs:
                     python-version: ${{ matrix.python-version }}
             -   name: Install dependencies
                 run: |
-                    pip install --upgrade pip
-                    pip install -e .
-                    pip install .[dev]
+                    pip install --upgrade pip setuptools wheel
                     pip install Django==${{ matrix.django-version }}
+                    pip install -r requirements_dev.txt
             -   name: Lint
                 run: |
                     make lint
