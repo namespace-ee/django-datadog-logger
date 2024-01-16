@@ -138,9 +138,6 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             if getattr(wsgi_request, "session", None) is not None and getattr(wsgi_request.session, "session_key"):
                 log_entry_dict["usr.session_key"] = wsgi_request.session.session_key
 
-        if hasattr(settings, "DATADOG_TRACE") and "TAGS" in settings.DATADOG_TRACE:
-            log_entry_dict["syslog.env"] = settings.DATADOG_TRACE["TAGS"].get("env")
-
         if record.exc_info:
             if hasattr(record, "status_code"):
                 log_entry_dict["error.kind"] = record.status_code
