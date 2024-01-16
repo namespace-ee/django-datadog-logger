@@ -76,7 +76,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "logger.name": record.name,
             "logger.thread_name": record.threadName,
             "logger.method_name": record.funcName,
-            "syslog.timestamp": pytz.utc.localize(datetime.datetime.utcfromtimestamp(record.created)).isoformat(),
+            "date": pytz.utc.localize(datetime.datetime.utcfromtimestamp(record.created)).isoformat(),
             "status": record.levelname,
         }
 
