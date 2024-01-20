@@ -71,7 +71,7 @@ def get_wsgi_request_user(wsgi_request):
 
 
 class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
-    def json_record(self, message: str, extra: dict, record: LogRecord) -> dict:
+    def json_record(self, message: str, extra: typing.Dict, record: LogRecord) -> typing.Dict:
         log_entry_dict = {
             "message": message,
             "logger.name": record.name,
@@ -173,18 +173,18 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
         return log_entry_dict
 
-    def get_datadog_attributes(self, record: LogRecord) -> dict:
+    def get_datadog_attributes(self, record: LogRecord) -> typing.Dict:
         """Helper to extract dd.* attributes from the log record."""
         return {attr_name: record.__dict__[attr_name] for attr_name in record.__dict__ if attr_name.startswith("dd.")}
 
     def get_wsgi_request(self) -> typing.Optional[HttpRequest]:
         return django_datadog_logger.wsgi.get_wsgi_request()
 
-    def to_json(self, record: dict) -> str:
+    def to_json(self, record: typing.Dict) -> str:
         """Converts record dict to a JSON string."""
         return self.json_lib.dumps(record, cls=SafeJsonEncoder)
 
-    def extra_from_record(self, record: LogRecord) -> dict:
+    def extra_from_record(self, record: LogRecord) -> typing.Dict:
         """Returns `extra` dict you passed to logger.
 
         The `extra` keyword argument is used to populate the `__dict__` of
