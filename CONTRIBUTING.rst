@@ -103,7 +103,7 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for Python 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/namespace-ee/django-datadog-logger/pull_requests
+   https://github.com/namespace-ee/django-datadog-logger/actions
    and make sure that the tests pass for all supported Python versions.
 
 Deploying
@@ -117,4 +117,4 @@ $ bump2version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+GitHub Actions will then deploy to PyPI if tests pass.
