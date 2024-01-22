@@ -102,6 +102,12 @@ Configure LOGGERS in your Django settings file:
             "django_datadog_logger.rest_framework": {"handlers": ["application"], "level": "INFO", "propagate": False},
         },
     }
+
+If you would like to whitelist your projects for passing extra arguments to the json log record, please set
+the following regular expression:
+
+.. code-block:: python
+
     DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = r"^(django_datadog_logger|my_project)(|\..+)$"
 
 Add Celery logger configuration and request_id tracking decorator to tasks:
@@ -159,7 +165,7 @@ Add Celery logger configuration and request_id tracking decorator to tasks:
         logger.info("INFO", extra={"level": "INFO"})
         logger.debug("DEBUG", extra={"level": "DEBUG"})
         return 42
-        
+
 ddtrace
 -------
 
