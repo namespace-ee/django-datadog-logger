@@ -1,11 +1,8 @@
 # Django DataDog Logger
 
 [![image](https://img.shields.io/pypi/v/django-datadog-logger.svg)](https://pypi.python.org/pypi/django-datadog-logger)
-
 [![CI Checks](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/pr-checks.yml)
-
 [![Black](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/black.yml/badge.svg)](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/black.yml)
-
 [![Documentation Status](https://readthedocs.org/projects/django-datadog-logger/badge/?version=latest)](https://django-datadog-logger.readthedocs.io/en/latest/?badge=latest)
 
 Django DataDog Logger integration package.
