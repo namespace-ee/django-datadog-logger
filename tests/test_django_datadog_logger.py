@@ -1,4 +1,5 @@
 """Tests for `django_datadog_logger` package."""
+
 import logging
 import unittest
 
