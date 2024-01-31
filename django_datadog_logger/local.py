@@ -7,7 +7,6 @@ https://github.com/mitsuhiko/werkzeug/blob/master/AUTHORS for more details.
 TODO: consider replacing with https://github.com/django/asgiref/#threadlocal-replacement
 """
 
-
 __all__ = ["Local", "release_local"]
 
 try:
