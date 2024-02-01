@@ -117,7 +117,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
             try:
                 auth = get_wsgi_request_auth(wsgi_request)
-            except RecursionDetected:
+            except:  # NOQA: we cannot crash the log formatter under any circumstances
                 auth = None
 
             if auth:
@@ -128,7 +128,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
             try:
                 user = get_wsgi_request_user(wsgi_request)
-            except RecursionDetected:
+            except:  # NOQA: we cannot crash the log formatter under any circumstances
                 user = None
 
             if user:
