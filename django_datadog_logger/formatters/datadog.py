@@ -4,22 +4,22 @@ import traceback
 import typing
 from logging import LogRecord
 
-import pytz
 import json_log_formatter
+import pytz
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
 from django.http.request import split_domain_port, HttpRequest
 from django.urls import resolve, NoReverseMatch, Resolver404
 from rest_framework.compat import unicode_http_header
 
-from django_datadog_logger.encoders import SafeJsonEncoder
-from django_datadog_logger.celery import get_task_name, get_celery_request
 import django_datadog_logger.celery
 import django_datadog_logger.wsgi
+from django_datadog_logger.celery import get_task_name, get_celery_request
+from django_datadog_logger.encoders import SafeJsonEncoder
+from django_datadog_logger.recursion import not_recursive
 
 # those fields are excluded from extra dict
 # and remains acceptable in record
-from django_datadog_logger.recursion import not_recursive, RecursionDetected
 
 EXCLUDE_FROM_EXTRA_ATTRS = {
     "user",
