@@ -1,5 +1,5 @@
-from functools import wraps
 import inspect
+from functools import wraps
 
 
 class RecursionDetected(RuntimeError):
