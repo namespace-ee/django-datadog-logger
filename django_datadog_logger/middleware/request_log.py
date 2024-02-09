@@ -12,14 +12,14 @@ class RequestLoggingMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        self.log_request(request, response)
+        self.log_response(request, response)
         return response
 
     def process_response(self, request, response):
-        self.log_request(request, response)
+        self.log_response(request, response)
         return response
 
-    def log_request(self, request, response):
+    def log_response(self, request, response):
         log_entry_dict = {"http.status_code": response.status_code}
 
         if hasattr(request, "request_start_time"):
