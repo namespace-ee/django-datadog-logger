@@ -26,7 +26,7 @@ class RequestLoggingMiddleware:
             duration_seconds = time.time() - request.request_start_time
             log_entry_dict["duration"] = duration_seconds * 1000000000.0
 
-        if response.status_code in range(400, 500):
+        if 400 <= response.status_code < 500:
             log_entry_dict["error.kind"] = response.status_code
             log_entry_dict["error.message"] = response.reason_phrase
             if hasattr(response, "data") and isinstance(response.data, (list, dict, ReturnDict)):
@@ -35,7 +35,7 @@ class RequestLoggingMiddleware:
                 f"HTTP {response.status_code} {response.reason_phrase}",
                 extra=log_entry_dict,
             )
-        elif response.status_code in range(500, 600):
+        elif 500 <= response.status_code < 600:
             log_entry_dict["error.kind"] = response.status_code
             log_entry_dict["error.message"] = response.reason_phrase
             logger.error(
