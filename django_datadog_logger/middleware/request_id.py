@@ -2,7 +2,6 @@ import re
 import time
 import uuid
 
-from django_datadog_logger.local import release_local
 from django_datadog_logger.wsgi import local
 
 
@@ -17,16 +16,29 @@ def get_or_create_request_id(request):
     else:
         return generate_request_id()
 
+try:
+    from django.utils.deprecation import MiddlewareMixin
 
-class RequestIdMiddleware:
-    def __init__(self, get_response=None):
-        self.get_response = get_response
+    class RequestIdMiddleware(MiddlewareMixin):
 
-    def __call__(self, request):
-        request.request_id = get_or_create_request_id(request)
-        request.request_start_time = time.time()
-        local.request = request
-        response = self.get_response(request)
-        response["X-Request-ID"] = request.request_id
-        release_local(local)
-        return response
+        def process_request(self, request):
+            request.request_id = get_or_create_request_id(request)
+            request.request_start_time = time.time()
+            local.request = request
+
+        def process_response(self, request, response):
+            response["X-Request-ID"] = request.request_id
+            return response
+
+except ImportError:
+    class RequestIdMiddleware:
+        def __init__(self, get_response=None):
+            self.get_response = get_response
+
+        def __call__(self, request):
+            request.request_id = get_or_create_request_id(request)
+            request.request_start_time = time.time()
+            local.request = request
+            response = self.get_response(request)
+            response["X-Request-ID"] = request.request_id
+            return response

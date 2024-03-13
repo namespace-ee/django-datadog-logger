@@ -1,3 +1,4 @@
+asgiref
 JSON-log-formatter
 Django
 djangorestframework

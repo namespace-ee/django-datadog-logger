@@ -5,45 +5,80 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 
 logger = logging.getLogger(__name__)
 
+try:
+    from django.utils.deprecation import MiddlewareMixin
 
-class RequestLoggingMiddleware:
-    def __init__(self, get_response=None):
-        self.get_response = get_response
+    class RequestLoggingMiddleware(MiddlewareMixin):
 
-    def __call__(self, request):
-        response = self.get_response(request)
-        self.log_response(request, response)
-        return response
+        def process_response(self, request, response):
+            log_entry_dict = {"http.status_code": response.status_code}
 
-    def process_response(self, request, response):
-        self.log_response(request, response)
-        return response
+            if hasattr(request, "request_start_time"):
+                duration_seconds = time.time() - request.request_start_time
+                log_entry_dict["duration"] = duration_seconds * 1000000000.0
 
-    def log_response(self, request, response):
-        log_entry_dict = {"http.status_code": response.status_code}
+            if 400 <= response.status_code < 500:
+                log_entry_dict["error.kind"] = response.status_code
+                log_entry_dict["error.message"] = response.reason_phrase
+                if hasattr(response, "data") and isinstance(response.data, (list, dict, ReturnDict)):
+                    log_entry_dict["error.stack"] = response.data
+                logger.warning(
+                    f"HTTP {response.status_code} {response.reason_phrase}",
+                    extra=log_entry_dict,
+                )
+            elif 500 <= response.status_code < 600:
+                log_entry_dict["error.kind"] = response.status_code
+                log_entry_dict["error.message"] = response.reason_phrase
+                logger.error(
+                    f"HTTP {response.status_code} {response.reason_phrase}",
+                    extra=log_entry_dict,
+                )
+            else:
+                logger.info(
+                    f"HTTP {response.status_code} {response.reason_phrase}",
+                    extra=log_entry_dict,
+                )
+            return response
 
-        if hasattr(request, "request_start_time"):
-            duration_seconds = time.time() - request.request_start_time
-            log_entry_dict["duration"] = duration_seconds * 1000000000.0
+except ImportError:
+    class RequestLoggingMiddleware:
+        def __init__(self, get_response=None):
+            self.get_response = get_response
 
-        if 400 <= response.status_code < 500:
-            log_entry_dict["error.kind"] = response.status_code
-            log_entry_dict["error.message"] = response.reason_phrase
-            if hasattr(response, "data") and isinstance(response.data, (list, dict, ReturnDict)):
-                log_entry_dict["error.stack"] = response.data
-            logger.warning(
-                f"HTTP {response.status_code} {response.reason_phrase}",
-                extra=log_entry_dict,
-            )
-        elif 500 <= response.status_code < 600:
-            log_entry_dict["error.kind"] = response.status_code
-            log_entry_dict["error.message"] = response.reason_phrase
-            logger.error(
-                f"HTTP {response.status_code} {response.reason_phrase}",
-                extra=log_entry_dict,
-            )
-        else:
-            logger.info(
-                f"HTTP {response.status_code} {response.reason_phrase}",
-                extra=log_entry_dict,
-            )
+        def __call__(self, request):
+            response = self.get_response(request)
+            self.log_response(request, response)
+            return response
+
+        def process_response(self, request, response):
+            self.log_response(request, response)
+            return response
+
+        def log_response(self, request, response):
+            log_entry_dict = {"http.status_code": response.status_code}
+
+            if hasattr(request, "request_start_time"):
+                duration_seconds = time.time() - request.request_start_time
+                log_entry_dict["duration"] = duration_seconds * 1000000000.0
+
+            if 400 <= response.status_code < 500:
+                log_entry_dict["error.kind"] = response.status_code
+                log_entry_dict["error.message"] = response.reason_phrase
+                if hasattr(response, "data") and isinstance(response.data, (list, dict, ReturnDict)):
+                    log_entry_dict["error.stack"] = response.data
+                logger.warning(
+                    f"HTTP {response.status_code} {response.reason_phrase}",
+                    extra=log_entry_dict,
+                )
+            elif 500 <= response.status_code < 600:
+                log_entry_dict["error.kind"] = response.status_code
+                log_entry_dict["error.message"] = response.reason_phrase
+                logger.error(
+                    f"HTTP {response.status_code} {response.reason_phrase}",
+                    extra=log_entry_dict,
+                )
+            else:
+                logger.info(
+                    f"HTTP {response.status_code} {response.reason_phrase}",
+                    extra=log_entry_dict,
+                )
