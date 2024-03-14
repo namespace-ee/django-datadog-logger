@@ -27,5 +27,6 @@ class RequestIdMiddleware:
         local.request = request
         response = self.get_response(request)
         response["X-Request-ID"] = request.request_id
-        del local.request
+        if hasattr(local, "request"):
+            del local.request
         return response
