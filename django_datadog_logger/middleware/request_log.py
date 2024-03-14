@@ -23,7 +23,7 @@ class RequestLoggingMiddleware:
         log_entry_dict = {"http.status_code": response.status_code}
 
         if hasattr(request, "request_start_time"):
-            duration_seconds = time.time() - request.request_start_time
+            duration_seconds = getattr(response, "response_start_time", time.time()) - request.request_start_time
             log_entry_dict["duration"] = duration_seconds * 1000000000.0
 
         if 400 <= response.status_code < 500:
