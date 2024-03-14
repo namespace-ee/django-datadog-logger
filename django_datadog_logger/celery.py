@@ -1,6 +1,6 @@
 from functools import wraps
 
-from django_datadog_logger.local import Local, release_local  # NOQA
+from asgiref.local import Local  # NOQA
 
 local = Local()
 
@@ -31,7 +31,7 @@ def store_celery_request(func):
                     local.request = request
             return func(*args, **kwargs)
         finally:
-            release_local(local)
+            del local.request
 
     return function_wrapper
 
