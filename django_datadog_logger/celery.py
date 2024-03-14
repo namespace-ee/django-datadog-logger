@@ -31,7 +31,8 @@ def store_celery_request(func):
                     local.request = request
             return func(*args, **kwargs)
         finally:
-            del local.request
+            if hasattr(local, "request"):
+                del local.request
 
     return function_wrapper
 
