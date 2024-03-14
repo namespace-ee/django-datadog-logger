@@ -2,7 +2,6 @@ import re
 import time
 import uuid
 
-from django_datadog_logger.local import release_local
 from django_datadog_logger.wsgi import local
 
 
@@ -28,5 +27,5 @@ class RequestIdMiddleware:
         local.request = request
         response = self.get_response(request)
         response["X-Request-ID"] = request.request_id
-        release_local(local)
+        del local.request
         return response
