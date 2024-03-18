@@ -20,7 +20,6 @@ try:
     from django.utils.deprecation import MiddlewareMixin
 
     class RequestIdMiddleware(MiddlewareMixin):
-
         def process_request(self, request):
             request.request_id = get_or_create_request_id(request)
             request.request_start_time = time.time()

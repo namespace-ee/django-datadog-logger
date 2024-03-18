@@ -82,3 +82,4 @@ except ImportError:
                     f"HTTP {response.status_code} {response.reason_phrase}",
                     extra=log_entry_dict,
                 )
+
