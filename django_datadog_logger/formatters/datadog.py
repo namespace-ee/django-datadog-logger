@@ -1,27 +1,48 @@
 import datetime
-import re
+import logging
 import traceback
 import typing
+import pytz
+import orjson
+import django_datadog_logger.celery
+import django_datadog_logger.wsgi
+
 from logging import LogRecord
 
-import json_log_formatter
-import pytz
-from django.conf import settings
+# from django.conf import settings
 from django.core.exceptions import DisallowedHost
 from django.http.request import split_domain_port, HttpRequest
 from django.urls import resolve, NoReverseMatch, Resolver404
-from rest_framework.compat import unicode_http_header
 
-import django_datadog_logger.celery
-import django_datadog_logger.wsgi
 from django_datadog_logger.celery import get_task_name, get_celery_request
-from django_datadog_logger.encoders import SafeJsonEncoder
 from django_datadog_logger.recursion import not_recursive
 
 # those fields are excluded from extra dict
 # and remains acceptable in record
 
-EXCLUDE_FROM_EXTRA_ATTRS = {
+BUILTIN_ATTRS = {
+    'args',
+    'asctime',
+    'created',
+    'exc_info',
+    'exc_text',
+    'filename',
+    'funcName',
+    'levelname',
+    'levelno',
+    'lineno',
+    'module',
+    'msecs',
+    'message',
+    'msg',
+    'name',
+    'pathname',
+    'process',
+    'processName',
+    'relativeCreated',
+    'stack_info',
+    'thread',
+    'threadName',
     "user",
     "auth",
     "username",
@@ -47,10 +68,6 @@ def determine_version(request):
     if hasattr(request, "version"):
         if request.version is not None:
             return str(request.version)
-    elif hasattr(request, "accepted_types"):
-        for t in request.accepted_types:
-            if t.params.get("version") is not None:
-                return unicode_http_header(t.params.get("version"))
     return None
 
 
@@ -70,7 +87,20 @@ def get_wsgi_request_user(wsgi_request):
             return wsgi_request.user
 
 
-class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
+class DataDogJSONFormatter(logging.Formatter):
+
+    def format(self, record):
+        message = record.getMessage()
+        extra = self.extra_from_record(record)
+        result = self.json_record(message, extra, record)
+        # TODO: mutated_record = self.mutate_json_record(json_record)
+        # Backwards compatibility: Functions that overwrite this but don't
+        # return a new value will return None because they modified the
+        # argument passed in.
+
+        return self.to_json(result)
+
+
     def json_record(self, message: str, extra: typing.Dict, record: LogRecord) -> typing.Dict:
         log_entry_dict = {
             "message": message,
@@ -167,9 +197,9 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             if "runtime" in extra["data"]:
                 log_entry_dict["duration"] = extra["data"]["runtime"] * 1000000000
 
-        if hasattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"):
-            if re.match(getattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"), record.name):
-                log_entry_dict.update(extra)
+        # if hasattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"):
+        #     if re.match(getattr(settings, "DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE"), record.name):
+        #         log_entry_dict.update(extra)
 
         return log_entry_dict
 
@@ -182,7 +212,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
     def to_json(self, record: typing.Dict) -> str:
         """Converts record dict to a JSON string."""
-        return self.json_lib.dumps(record, cls=SafeJsonEncoder)
+        return orjson.dumps(record, default=str).decode("utf-8")
 
     def extra_from_record(self, record: LogRecord) -> typing.Dict:
         """Returns `extra` dict you passed to logger.
@@ -194,5 +224,5 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
         return {
             attr_name: record.__dict__[attr_name]
             for attr_name in record.__dict__
-            if attr_name not in json_log_formatter.BUILTIN_ATTRS.union(EXCLUDE_FROM_EXTRA_ATTRS)
+            if attr_name not in BUILTIN_ATTRS
         }
