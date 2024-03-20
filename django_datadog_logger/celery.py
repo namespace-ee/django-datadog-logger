@@ -7,19 +7,17 @@ local = Local()
 
 
 def get_celery_request():
-    try:
-        return local.request
-    except AttributeError:
-        return None
+    return getattr(local, "request", None)
 
 
 def get_task_name(request):
-    if hasattr(request, "task"):
-        if isinstance(request.task, str):
-            return request.task
-        elif hasattr(request.task, "name"):
-            return request.task.name
-    return None
+    try:
+        return request.task.name
+    except AttributeError:
+        try:
+            return str(request.task)
+        except AttributeError:
+            return None
 
 
 def store_celery_request(func):

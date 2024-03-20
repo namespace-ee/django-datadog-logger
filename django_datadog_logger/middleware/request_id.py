@@ -1,7 +1,7 @@
-import re
 import time
 import uuid
 
+from django.utils.deprecation import MiddlewareMixin
 from django_datadog_logger.wsgi import local
 
 
@@ -11,34 +11,17 @@ def generate_request_id():
 
 def get_or_create_request_id(request):
     request_id = request.META.get("HTTP_X_REQUEST_ID")
-    if request_id and re.match("^[a-zA-Z0-9+/=-]{20,200}$", request_id):
-        return request_id
-    else:
-        return generate_request_id()
+    return request_id or generate_request_id()
 
-try:
-    from django.utils.deprecation import MiddlewareMixin
 
-    class RequestIdMiddleware(MiddlewareMixin):
+class RequestIdMiddleware(MiddlewareMixin):
 
-        def process_request(self, request):
-            request.request_id = get_or_create_request_id(request)
-            request.request_start_time = time.time()
-            local.request = request
+    def process_request(self, request):
+        request.request_id = get_or_create_request_id(request)
+        request.request_start_time = time.time()
+        local.request = request
 
-        def process_response(self, request, response):
-            response["X-Request-ID"] = request.request_id
-            return response
+    def process_response(self, request, response):
+        response["X-Request-ID"] = request.request_id
+        return response
 
-except ImportError:
-    class RequestIdMiddleware:
-        def __init__(self, get_response=None):
-            self.get_response = get_response
-
-        def __call__(self, request):
-            request.request_id = get_or_create_request_id(request)
-            request.request_start_time = time.time()
-            local.request = request
-            response = self.get_response(request)
-            response["X-Request-ID"] = request.request_id
-            return response
