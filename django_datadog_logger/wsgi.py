@@ -1,4 +1,5 @@
-from asgiref.local import Local
+from asgiref.local import Local  # NOQA
+
 
 
 local = Local()
