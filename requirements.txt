@@ -1,4 +1,4 @@
 JSON-log-formatter
 Django
 djangorestframework
-pytz
+backports.zoneinfo;python_version<"3.9"
