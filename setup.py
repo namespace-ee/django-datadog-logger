@@ -21,9 +21,6 @@ with open("requirements.txt") as requirements_file:
 
 setup_requirements = []
 
-test_requirements = []
-
-
 setup(
     author="Lenno Nagel",
     author_email="lenno@namespace.ee",
@@ -50,8 +47,6 @@ setup(
     name="django-datadog-logger",
     packages=find_packages(include=["django_datadog_logger", "django_datadog_logger.*"]),
     setup_requires=setup_requirements,
-    test_suite="tests",
-    tests_require=test_requirements,
     url="https://github.com/namespace-ee/django-datadog-logger",
     version="0.7.1",
     zip_safe=False,
