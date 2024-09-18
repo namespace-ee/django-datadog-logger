@@ -48,6 +48,6 @@ setup(
     packages=find_packages(include=["django_datadog_logger", "django_datadog_logger.*"]),
     setup_requires=setup_requirements,
     url="https://github.com/namespace-ee/django-datadog-logger",
-    version="0.7.1",
+    version="0.7.2",
     zip_safe=False,
 )
