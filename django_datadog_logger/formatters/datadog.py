@@ -81,9 +81,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "logger.name": record.name,
             "logger.thread_name": record.threadName,
             "logger.method_name": record.funcName,
-            "date": (
-                datetime.datetime.fromtimestamp(record.created, tz=zoneinfo.ZoneInfo("UTC")).isoformat()
-            ),
+            "date": (datetime.datetime.fromtimestamp(record.created, tz=zoneinfo.ZoneInfo("UTC")).isoformat()),
             "status": record.levelname,
         }
 
