@@ -4,6 +4,11 @@ import traceback
 import typing
 from logging import LogRecord
 
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
 import json_log_formatter
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
@@ -77,7 +82,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             "logger.thread_name": record.threadName,
             "logger.method_name": record.funcName,
             "date": (
-                datetime.datetime.fromtimestamp(record.created, tz=datetime.UTC).isoformat()
+                datetime.datetime.fromtimestamp(record.created, tz=zoneinfo.ZoneInfo("UTC")).isoformat()
             ),
             "status": record.levelname,
         }
