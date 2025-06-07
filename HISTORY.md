@@ -1,5 +1,9 @@
 # History
 
+## Unreleased
+
+-   Converted to PEP-518 with `pyproject.toml` and preference for `uv`
+
 ## 0.6.2 (2023-04-27)
 
 -   Fixed case where accessing request.auth may raise errors
