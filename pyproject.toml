@@ -1,5 +1,6 @@
 [build-system]
 requires = ["setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-datadog-logger"
