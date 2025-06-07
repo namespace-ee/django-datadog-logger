@@ -698,7 +698,6 @@ wheels = [
 
 [[package]]
 name = "django-datadog-logger"
-version = "0.7.3"
 source = { editable = "." }
 dependencies = [
     { name = "backports-zoneinfo", marker = "python_full_version < '3.9'" },
