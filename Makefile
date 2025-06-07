@@ -21,10 +21,11 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
-BROWSER := uv run python -c "$$BROWSER_PYSCRIPT"
+UV := uv run
+BROWSER := $(UV) python -c "$$BROWSER_PYSCRIPT"
 
 help:
-	@uv run python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+	@$(UV) python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 clean: clean-test clean-build clean-pyc ## remove all build, test, coverage and Python artifacts
 
@@ -48,30 +49,30 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	uv run tox -e flake8
+	$(UV) tox -e flake8
 
 test: ## run tests quickly with the default Python
-	DJANGO_SETTINGS_MODULE=tests.settings uv run -m unittest discover -v
+	DJANGO_SETTINGS_MODULE=tests.settings $(UV) -m unittest discover -v
 
 test-all: ## run tests on every Python version with tox
-	uv run tox
+	$(UV) tox
 
 coverage: ## check code coverage quickly with the default Python
-	DJANGO_SETTINGS_MODULE=tests.settings uv run coverage run --source django_datadog_logger -m unittest discover -v
-	uv run coverage report -m
-	uv run coverage html
+	DJANGO_SETTINGS_MODULE=tests.settings $(UV) coverage run --source django_datadog_logger -m unittest discover -v
+	$(UV) coverage report -m
+	$(UV) coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/django_datadog_logger.rst
 	rm -f docs/modules.rst
-	uv run sphinx-apidoc -o docs/ django_datadog_logger
+	$(UV) sphinx-apidoc -o docs/ django_datadog_logger
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
 servedocs: docs ## compile the docs watching for changes
-	uv run watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+	$(UV) watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release: dist ## package and upload a release
 	uv publish
