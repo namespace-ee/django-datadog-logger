@@ -47,6 +47,7 @@ docs = [
     # Documentation will be built with the Python from .python-version
     "sphinx>=7,<8; python_version>'3.8'",
     "myst-parser>=2,<3; python_version>'3.8'",
+    "importlib-metadata; python_version<'3.8'",
 ]
 pep8 = [
     "black",

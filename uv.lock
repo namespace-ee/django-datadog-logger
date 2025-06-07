@@ -723,6 +723,7 @@ dev = [
     { name = "watchdog", version = "6.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 docs = [
+    { name = "importlib-metadata", version = "6.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
     { name = "myst-parser", marker = "python_full_version >= '3.9'" },
     { name = "sphinx", marker = "python_full_version >= '3.9'" },
 ]
@@ -754,6 +755,7 @@ dev = [
     { name = "watchdog" },
 ]
 docs = [
+    { name = "importlib-metadata", marker = "python_full_version < '3.8'" },
     { name = "myst-parser", marker = "python_full_version >= '3.9'", specifier = ">=2,<3" },
     { name = "sphinx", marker = "python_full_version >= '3.9'", specifier = ">=7,<8" },
 ]
