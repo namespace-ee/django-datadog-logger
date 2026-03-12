@@ -36,7 +36,6 @@ dev = [
     "flake8",
     "tox",
     "coverage",
-    "twine",
     "black",
 ]
 docs = [
