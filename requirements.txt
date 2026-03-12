@@ -1,4 +1,0 @@
-JSON-log-formatter
-Django
-djangorestframework
-backports.zoneinfo;python_version<"3.9"
