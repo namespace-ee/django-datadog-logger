@@ -12,13 +12,13 @@ except ImportError:
 import json_log_formatter
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
-from django.http.request import split_domain_port, HttpRequest
-from django.urls import resolve, NoReverseMatch, Resolver404
+from django.http.request import HttpRequest, split_domain_port
+from django.urls import NoReverseMatch, Resolver404, resolve
 from rest_framework.compat import unicode_http_header
 
 import django_datadog_logger.celery
 import django_datadog_logger.wsgi
-from django_datadog_logger.celery import get_task_name, get_celery_request
+from django_datadog_logger.celery import get_celery_request, get_task_name
 from django_datadog_logger.encoders import SafeJsonEncoder
 from django_datadog_logger.recursion import not_recursive
 
@@ -121,7 +121,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
             try:
                 auth = get_wsgi_request_auth(wsgi_request)
-            except:  # NOQA: we cannot crash the log formatter under any circumstances
+            except:  # noqa: E722 - we cannot crash the log formatter under any circumstances
                 auth = None
 
             if auth:
@@ -132,7 +132,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
 
             try:
                 user = get_wsgi_request_user(wsgi_request)
-            except:  # NOQA: we cannot crash the log formatter under any circumstances
+            except:  # noqa: E722 - we cannot crash the log formatter under any circumstances
                 user = None
 
             if user:

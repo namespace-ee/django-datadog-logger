@@ -8,9 +8,16 @@ requires-python = ">=3.10"
 authors = [{ name = "Lenno Nagel", email = "lenno@namespace.ee" }]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -30,13 +37,10 @@ Homepage = "https://github.com/namespace-ee/django-datadog-logger"
 
 [dependency-groups]
 dev = [
-    "bump2version",
-    "wheel",
-    "watchdog",
-    "flake8",
-    "tox",
-    "coverage",
-    "black",
+    "bump-my-version",
+    "pytest",
+    "pytest-django",
+    "ruff",
 ]
 docs = [
     "sphinx>=7,<8",
@@ -50,16 +54,25 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["django_datadog_logger"]
 
-[tool.black]
-line-length = 120
-target-version = ["py310", "py311", "py312", "py313", "py314"]
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | build
-  | dist
-)/
-'''
+[tool.bumpversion]
+current_version = "0.7.3"
+commit = true
+tag = true
 
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "django_datadog_logger/__init__.py"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"

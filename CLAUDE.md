@@ -3,7 +3,7 @@
 ## Project
 
 Django DataDog Logger — a Django package for DataDog JSON logging integration.
-Package: `django_datadog_logger`. Version managed via `bump2version` in `pyproject.toml` and `django_datadog_logger/__init__.py`.
+Package: `django_datadog_logger`. Version managed via `bump-my-version` in `pyproject.toml` and `django_datadog_logger/__init__.py`.
 
 ## Setup
 
@@ -13,20 +13,19 @@ uv sync --dev
 
 ## Common Commands
 
-- **Lint**: `make lint` (runs flake8)
-- **Test**: `make test` (runs `DJANGO_SETTINGS_MODULE=tests.settings uv run python -m unittest discover`)
+- **Lint**: `make lint` (runs `ruff check .` and `ruff format --check .`)
+- **Test**: `make test` (runs `uv run pytest tests/ -v`)
 - **Build**: `make dist` (runs `uv build`)
 - **Clean**: `make clean`
 
 ## Testing
 
-Tests use `unittest` (not pytest). Test files live in `tests/`. Django settings: `tests/settings.py`.
+Tests use `pytest` with `pytest-django`. Test files live in `tests/`. Django settings configured in `pyproject.toml` under `[tool.pytest.ini_options]`.
 
 ## CI
 
-GitHub Actions (`.github/workflows/pr-checks.yml`): matrix of Python 3.10–3.14 × Django 4/5, then build on Python 3.12. Black formatting checked via `black.yml`.
+GitHub Actions (`.github/workflows/build.yml`): lint job (ruff), test matrix of Python 3.10–3.14 × Django 4.2/5.2/6.0, build + publish on release.
 
 ## Code Style
 
-- Formatter: Black (line-length 120)
-- Linter: flake8 (max-line-length 120, config in `setup.cfg`)
+- Linter & formatter: ruff (line-length 120, rules: E, F, I)

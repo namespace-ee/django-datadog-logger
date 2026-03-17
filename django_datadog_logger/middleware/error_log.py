@@ -1,6 +1,6 @@
 import logging
 
-from django.core.exceptions import PermissionDenied, BadRequest, SuspiciousOperation
+from django.core.exceptions import BadRequest, PermissionDenied, SuspiciousOperation
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 

@@ -47,17 +47,18 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint: ## check style with flake8
-	uv run flake8 django_datadog_logger tests
+lint: ## check style with ruff
+	uv run ruff check .
+	uv run ruff format --check .
 
 test: ## run tests quickly with the default Python
-	DJANGO_SETTINGS_MODULE=tests.settings uv run python -m unittest discover
+	uv run pytest tests/ -v
 
 test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	DJANGO_SETTINGS_MODULE=tests.settings uv run coverage run --source django_datadog_logger -m unittest discover
+	uv run coverage run --source django_datadog_logger -m pytest tests/
 	uv run coverage report -m
 	uv run coverage html
 	$(BROWSER) htmlcov/index.html
