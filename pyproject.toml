@@ -1,6 +1,6 @@
 [project]
 name = "django-datadog-logger"
-version = "0.7.3"
+version = "0.8.0"
 description = "Django Datadog Logger integration package."
 readme = "README.md"
 license = "MIT"
@@ -55,7 +55,7 @@ build-backend = "hatchling.build"
 packages = ["django_datadog_logger"]
 
 [tool.bumpversion]
-current_version = "0.7.3"
+current_version = "0.8.0"
 commit = true
 tag = true
 
