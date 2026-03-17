@@ -74,7 +74,7 @@ def get_wsgi_request_user(wsgi_request):
             return wsgi_request.user
 
 
-class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
+class DatadogJSONFormatter(json_log_formatter.JSONFormatter):
     def json_record(self, message: str, extra: typing.Dict, record: LogRecord) -> typing.Dict:
         log_entry_dict = {
             "message": message,
@@ -200,3 +200,7 @@ class DataDogJSONFormatter(json_log_formatter.JSONFormatter):
             for attr_name in record.__dict__
             if attr_name not in json_log_formatter.BUILTIN_ATTRS.union(EXCLUDE_FROM_EXTRA_ATTRS)
         }
+
+
+# Backwards compatibility alias
+DataDogJSONFormatter = DatadogJSONFormatter

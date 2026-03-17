@@ -1,7 +1,7 @@
 [project]
 name = "django-datadog-logger"
 version = "0.7.3"
-description = "Django DataDog Logger integration package."
+description = "Django Datadog Logger integration package."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"

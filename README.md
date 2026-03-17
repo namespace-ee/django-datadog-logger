@@ -1,11 +1,11 @@
-# Django DataDog Logger
+# Django Datadog Logger
 
 [![image](https://img.shields.io/pypi/v/django-datadog-logger.svg)](https://pypi.python.org/pypi/django-datadog-logger)
 [![CI Checks](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/pr-checks.yml)
 [![Black](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/black.yml/badge.svg)](https://github.com/namespace-ee/django-datadog-logger/actions/workflows/black.yml)
 [![Documentation Status](https://readthedocs.org/projects/django-datadog-logger/badge/?version=latest)](https://django-datadog-logger.readthedocs.io/en/latest/?badge=latest)
 
-Django DataDog Logger integration package.
+Django Datadog Logger integration package.
 
 -   Free software: MIT license
 -   Documentation: <https://django-datadog-logger.readthedocs.io>.
@@ -33,7 +33,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "console": {"format": "{levelname} {message}", "style": "{"},
-        "json": {"()": "django_datadog_logger.formatters.datadog.DataDogJSONFormatter"},
+        "json": {"()": "django_datadog_logger.formatters.datadog.DatadogJSONFormatter"},
     },
     "handlers": {
         "console": {"level": "INFO", "class": "logging.StreamHandler", "formatter": "console"},
@@ -110,10 +110,10 @@ logger = logging.getLogger(__name__)
 
 @after_setup_logger.connect
 def on_after_setup_logger(logger, *args, **kwargs):
-    from django_datadog_logger.formatters.datadog import DataDogJSONFormatter
+    from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
 
     if settings.API_LOG_CELERY_JSON:
-        formatter = DataDogJSONFormatter()
+        formatter = DatadogJSONFormatter()
         for handler in list(logger.handlers):
             handler.setFormatter(formatter)
             handler.setLevel(settings.API_LOG_CELERY_LEVEL)
@@ -121,10 +121,10 @@ def on_after_setup_logger(logger, *args, **kwargs):
 
 @after_setup_task_logger.connect
 def on_after_setup_task_logger(logger, *args, **kwargs):
-    from django_datadog_logger.formatters.datadog import DataDogJSONFormatter
+    from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
 
     if settings.API_LOG_CELERY_JSON:
-        formatter = DataDogJSONFormatter()
+        formatter = DatadogJSONFormatter()
         for handler in list(logger.handlers):
             handler.setFormatter(formatter)
             handler.setLevel(settings.API_LOG_CELERY_LEVEL)
@@ -166,14 +166,14 @@ automatically to the log entry created by this library.
 import ddtrace
 ddtrace.patch(logging=True)
 
-# Configure logger with DataDogJSONFormatter
+# Configure logger with DatadogJSONFormatter
 import logging
-from django_datadog_logger.formatters.datadog import DataDogJSONFormatter
+from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
 
 logger = logging.root
 
 handler = logging.StreamHandler()
-handler.formatter = DataDogJSONFormatter()
+handler.formatter = DatadogJSONFormatter()
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 

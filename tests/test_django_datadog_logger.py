@@ -2,7 +2,7 @@
 
 import logging
 
-from django_datadog_logger.formatters.datadog import DataDogJSONFormatter
+from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
 
 
 class TestDjangoDatadogLogger:
@@ -12,7 +12,7 @@ class TestDjangoDatadogLogger:
         attribute of the LogRecord is a tuple of (None, None, None).
         """
         record = logging.LogRecord("foo", logging.ERROR, "foo.py", 42, "This is an error", None, (None, None, None))
-        formatter = DataDogJSONFormatter()
+        formatter = DatadogJSONFormatter()
         json_record = formatter.json_record("Foo", {}, record)
 
         assert json_record.get("error.kind") is None

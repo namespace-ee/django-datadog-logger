@@ -2,7 +2,7 @@
 
 ## Project
 
-Django DataDog Logger — a Django package for DataDog JSON logging integration.
+Django Datadog Logger — a Django package for Datadog JSON logging integration.
 Package: `django_datadog_logger`. Version managed via `bump-my-version` in `pyproject.toml` and `django_datadog_logger/__init__.py`.
 
 ## Setup

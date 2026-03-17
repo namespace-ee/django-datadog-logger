@@ -1,4 +1,4 @@
-Welcome to Django DataDog Logger's documentation!
+Welcome to Django Datadog Logger's documentation!
 ======================================
 
 .. toctree::

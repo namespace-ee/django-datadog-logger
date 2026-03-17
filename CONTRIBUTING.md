@@ -31,8 +31,8 @@ it.
 
 ### Write Documentation
 
-Django DataDog Logger could always use more documentation, whether as
-part of the official Django DataDog Logger docs, in docstrings, or even
+Django Datadog Logger could always use more documentation, whether as
+part of the official Django Datadog Logger docs, in docstrings, or even
 on the web in blog posts, articles, and such.
 
 ### Submit Feedback

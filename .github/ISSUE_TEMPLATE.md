@@ -1,4 +1,4 @@
-* Django DataDog Logger version:
+* Django Datadog Logger version:
 * Python version:
 * Operating System:
 

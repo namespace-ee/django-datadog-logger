@@ -48,7 +48,7 @@ source_suffix = [".rst", ".md"]
 master_doc = "index"
 
 # General information about the project.
-project = "Django DataDog Logger"
+project = "Django Datadog Logger"
 copyright = "2020, Lenno Nagel"
 author = "Lenno Nagel"
 
@@ -126,7 +126,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "django_datadog_logger.tex", "Django DataDog Logger Documentation", "Lenno Nagel", "manual"),
+    (master_doc, "django_datadog_logger.tex", "Django Datadog Logger Documentation", "Lenno Nagel", "manual"),
 ]
 
 
@@ -134,7 +134,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "django_datadog_logger", "Django DataDog Logger Documentation", [author], 1)]
+man_pages = [(master_doc, "django_datadog_logger", "Django Datadog Logger Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -146,7 +146,7 @@ texinfo_documents = [
     (
         master_doc,
         "django_datadog_logger",
-        "Django DataDog Logger Documentation",
+        "Django Datadog Logger Documentation",
         author,
         "django_datadog_logger",
         "One line description of project.",
