@@ -1,5 +1,17 @@
 # History
 
+## Unreleased
+
+-   Fixed: `not_recursive` raised a false `RecursionDetected` when an
+    unrelated function sharing the guarded function's name appeared on the
+    call stack -- it matched on frame *name* rather than actual re-entrancy.
+    Re-entrancy is now tracked with a per-function thread-local flag.
+-   Performance: `not_recursive` no longer calls `inspect.stack()` on every
+    call (which resolved the source file of every frame on the stack),
+    removing a per-call cost from the hot logging path -- the decorator wraps
+    the per-log-record `get_wsgi_request_user` / `get_wsgi_request_auth`
+    helpers.
+
 ## 0.6.2 (2023-04-27)
 
 -   Fixed case where accessing request.auth may raise errors
