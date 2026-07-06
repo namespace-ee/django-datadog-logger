@@ -5,6 +5,7 @@ import threading
 from unittest.mock import patch
 
 import pytest
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django_datadog_logger.recursion import RecursionDetected, not_recursive
 
@@ -33,6 +34,46 @@ def test_indirect_recursion_is_detected():
 
     with pytest.raises(RecursionDetected):
         outer()
+
+
+def test_detects_recursion_across_async_boundary():
+    """Re-entry that crosses a sync -> async -> sync hop within one request is
+    still caught.
+
+    This is the ASGI case the guard exists for: under ASGI a single request is
+    handled across the event-loop thread and ``sync_to_async`` executor threads,
+    so an auth loop can re-enter the guarded function on a *different* thread
+    while staying in the same request. Because the marker lives in an
+    ``asgiref.local.Local`` (which asgiref propagates across the boundary) rather
+    than in a thread-local, the in-flight marker set before the hop is visible
+    after it, and the loop is detected. A plain ``threading.local`` guard, bound
+    to the original thread, would not see it.
+    """
+    outer_thread = {}
+    boundary_thread = {}
+
+    @not_recursive
+    def guarded(reenter):
+        if not reenter:
+            return "leaf"
+        outer_thread["id"] = threading.get_ident()
+
+        async def bridge():
+            def reenter_guarded():
+                boundary_thread["id"] = threading.get_ident()
+                return guarded(reenter=False)  # re-entry -> must be blocked
+
+            # thread_sensitive=False forces a distinct executor thread.
+            return await sync_to_async(reenter_guarded, thread_sensitive=False)()
+
+        return async_to_sync(bridge)()
+
+    with pytest.raises(RecursionDetected):
+        guarded(reenter=True)
+
+    # The re-entry genuinely happened on another thread; the guard caught it
+    # anyway because it is scoped like the request, not like the thread.
+    assert boundary_thread["id"] != outer_thread["id"]
 
 
 def test_does_not_walk_the_stack():
