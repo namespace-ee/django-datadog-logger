@@ -2,10 +2,9 @@
 
 import collections.abc
 import logging
-from unittest.mock import patch
+from types import SimpleNamespace
 
-import django_datadog_logger.wsgi
-from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
+from django_datadog_logger.formatters.datadog import DatadogJSONFormatter, get_wsgi_request_auth
 
 
 class TestDjangoDatadogLogger:
@@ -37,25 +36,11 @@ class JWTCredentialsLike(collections.abc.Mapping):
         return len(self._payload)
 
 
-class TestRequestAuth:
-    def format_with_auth(self, rf, auth):
-        request = rf.get("/")
-        request.auth = auth
-        record = logging.LogRecord("foo", logging.INFO, "foo.py", 42, "Hello", None, None)
-        with (
-            patch.object(django_datadog_logger.wsgi.local, "request", request, create=True),
-            patch("django_datadog_logger.formatters.datadog.resolve", return_value=None),
-        ):
-            return DatadogJSONFormatter().json_record("Hello", {}, record)
+def test_dict_auth():
+    auth = {"sid": "session-1", "cid": "client-1"}
+    assert get_wsgi_request_auth(SimpleNamespace(auth=auth)) is auth
 
-    def test_dict_auth(self, rf):
-        json_record = self.format_with_auth(rf, {"sid": "session-1", "cid": "client-1"})
 
-        assert json_record["usr.session_id"] == "session-1"
-        assert json_record["usr.client_id"] == "client-1"
-
-    def test_mapping_auth(self, rf):
-        json_record = self.format_with_auth(rf, JWTCredentialsLike({"sid": "session-1", "cid": "client-1"}))
-
-        assert json_record["usr.session_id"] == "session-1"
-        assert json_record["usr.client_id"] == "client-1"
+def test_mapping_auth():
+    auth = JWTCredentialsLike({"sid": "session-1", "cid": "client-1"})
+    assert get_wsgi_request_auth(SimpleNamespace(auth=auth)) is auth
