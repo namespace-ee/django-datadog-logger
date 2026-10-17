@@ -4,12 +4,8 @@ import collections.abc
 import logging
 from unittest.mock import patch
 
-import pytest
-
 import django_datadog_logger.wsgi
 from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
-
-urlpatterns = []
 
 
 class TestDjangoDatadogLogger:
@@ -42,15 +38,14 @@ class JWTCredentialsLike(collections.abc.Mapping):
 
 
 class TestRequestAuth:
-    @pytest.fixture(autouse=True)
-    def urlconf(self, settings):
-        settings.ROOT_URLCONF = __name__
-
     def format_with_auth(self, rf, auth):
         request = rf.get("/")
         request.auth = auth
         record = logging.LogRecord("foo", logging.INFO, "foo.py", 42, "Hello", None, None)
-        with patch.object(django_datadog_logger.wsgi.local, "request", request, create=True):
+        with (
+            patch.object(django_datadog_logger.wsgi.local, "request", request, create=True),
+            patch("django_datadog_logger.formatters.datadog.resolve", return_value=None),
+        ):
             return DatadogJSONFormatter().json_record("Hello", {}, record)
 
     def test_dict_auth(self, rf):
