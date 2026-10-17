@@ -1,3 +1,4 @@
+import collections.abc
 import datetime
 import re
 import traceback
@@ -61,7 +62,7 @@ def determine_version(request):
 @not_recursive
 def get_wsgi_request_auth(wsgi_request):
     try:
-        if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, dict):
+        if getattr(wsgi_request, "auth", None) is not None and isinstance(wsgi_request.auth, collections.abc.Mapping):
             return wsgi_request.auth
     except Exception:  # NOQA
         return None
