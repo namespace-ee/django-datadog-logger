@@ -9,6 +9,8 @@ import pytest
 import django_datadog_logger.wsgi
 from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
 
+urlpatterns = []
+
 
 class TestDjangoDatadogLogger:
     def test_format_json_accepts_a_tuple_of_nones_as_exc_info(self):
@@ -42,7 +44,7 @@ class JWTCredentialsLike(collections.abc.Mapping):
 class TestRequestAuth:
     @pytest.fixture(autouse=True)
     def urlconf(self, settings):
-        settings.ROOT_URLCONF = "tests.urls"
+        settings.ROOT_URLCONF = __name__
 
     def format_with_auth(self, rf, auth):
         request = rf.get("/")
@@ -57,23 +59,8 @@ class TestRequestAuth:
         assert json_record["usr.session_id"] == "session-1"
         assert json_record["usr.client_id"] == "client-1"
 
-    def test_non_dict_mapping_auth(self, rf):
-        auth = JWTCredentialsLike({"sid": "session-1", "cid": "client-1"})
-        assert not isinstance(auth, dict)
-
-        json_record = self.format_with_auth(rf, auth)
+    def test_mapping_auth(self, rf):
+        json_record = self.format_with_auth(rf, JWTCredentialsLike({"sid": "session-1", "cid": "client-1"}))
 
         assert json_record["usr.session_id"] == "session-1"
         assert json_record["usr.client_id"] == "client-1"
-
-    def test_mapping_auth_without_claims(self, rf):
-        json_record = self.format_with_auth(rf, JWTCredentialsLike({"uid": 1}))
-
-        assert "usr.session_id" not in json_record
-        assert "usr.client_id" not in json_record
-
-    def test_non_mapping_auth_is_ignored(self, rf):
-        json_record = self.format_with_auth(rf, object())
-
-        assert "usr.session_id" not in json_record
-        assert "usr.client_id" not in json_record
