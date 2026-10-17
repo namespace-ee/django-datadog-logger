@@ -1,8 +1,10 @@
 """Tests for `django_datadog_logger` package."""
 
+import collections.abc
 import logging
+from types import SimpleNamespace
 
-from django_datadog_logger.formatters.datadog import DatadogJSONFormatter
+from django_datadog_logger.formatters.datadog import DatadogJSONFormatter, get_wsgi_request_auth
 
 
 class TestDjangoDatadogLogger:
@@ -16,3 +18,29 @@ class TestDjangoDatadogLogger:
         json_record = formatter.json_record("Foo", {}, record)
 
         assert json_record.get("error.kind") is None
+
+
+class JWTCredentialsLike(collections.abc.Mapping):
+    """Read-only Mapping that is not a dict, like rest_framework_sso JWTCredentials."""
+
+    def __init__(self, payload):
+        self._payload = payload
+
+    def __getitem__(self, key):
+        return self._payload[key]
+
+    def __iter__(self):
+        return iter(self._payload)
+
+    def __len__(self):
+        return len(self._payload)
+
+
+def test_dict_auth():
+    auth = {"sid": "session-1", "cid": "client-1"}
+    assert get_wsgi_request_auth(SimpleNamespace(auth=auth)) is auth
+
+
+def test_mapping_auth():
+    auth = JWTCredentialsLike({"sid": "session-1", "cid": "client-1"})
+    assert get_wsgi_request_auth(SimpleNamespace(auth=auth)) is auth
